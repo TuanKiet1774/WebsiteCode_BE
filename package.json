@@ -1,0 +1,28 @@
+{
+  "name": "websitecode_be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TuanKiet1774/WebsiteCode_BE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/TuanKiet1774/WebsiteCode_BE/issues"
+  },
+  "homepage": "https://github.com/TuanKiet1774/WebsiteCode_BE#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
