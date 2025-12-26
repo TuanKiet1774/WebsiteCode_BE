@@ -20,11 +20,13 @@ const codeSchema = new mongoose.Schema(
       default: ""
     },
 
-    topicId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Topic",
-      required: true
-    },
+    topics: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Topic",
+        required: true
+      }
+    ],
 
     language: {
       type: String,
@@ -66,7 +68,7 @@ const codeSchema = new mongoose.Schema(
 );
 
 codeSchema.index({ slug: 1 });
-codeSchema.index({ topicId: 1 });
+codeSchema.index({ topics: 1 });
 codeSchema.index({ tags: 1 });
 codeSchema.index({ title: "text", description: "text" });
 
