@@ -1,12 +1,8 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
 import topicRoutes from "./routes/topic.route.js";
 import codeRoutes from "./routes/code.route.js";
 import tagRoutes from "./routes/tag.route.js";
-
-dotenv.config();
 
 const app = express();
 
