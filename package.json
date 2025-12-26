@@ -20,10 +20,10 @@
   },
   "homepage": "https://github.com/TuanKiet1774/WebsiteCode_BE#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
     "express": "^5.2.1",
     "mongoose": "^9.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "slugify": "^1.6.6"
   },
   "devDependencies": {
