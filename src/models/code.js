@@ -32,11 +32,6 @@ const codeSchema = new mongoose.Schema(
       lowercase: true
     },
 
-    code: {
-      type: String,
-      required: true
-    },
-
     previewImages: [
       {
         type: String
@@ -59,16 +54,6 @@ const codeSchema = new mongoose.Schema(
         lowercase: true
       }
     ],
-
-    views: {
-      type: Number,
-      default: 0
-    },
-
-    likes: {
-      type: Number,
-      default: 0
-    },
 
     isFree: {
       type: Boolean,
