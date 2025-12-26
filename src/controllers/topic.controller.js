@@ -1,4 +1,4 @@
-import Topic from "../models/Topic.js";
+import Topic from "../models/topic.js";
 
 /**
  * CREATE topic

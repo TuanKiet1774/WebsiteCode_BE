@@ -1,4 +1,4 @@
-import Tag from "../models/Tag.js";
+import Tag from "../models/tag.js";
 
 /**
  * CREATE tag
