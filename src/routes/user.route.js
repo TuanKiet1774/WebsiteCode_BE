@@ -17,7 +17,8 @@ const router = express.Router();
  */
 
 // CREATE user (thường chỉ admin dùng)
-router.post("/", protect, createUser);
+// router.post("/", protect, createUser);
+router.post("/", createUser);
 
 // READ all users
 router.get("/", protect, getUsers);
