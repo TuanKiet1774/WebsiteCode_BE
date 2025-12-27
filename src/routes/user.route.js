@@ -12,8 +12,8 @@ import { protect } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
 // TẠM THỜI KHÔNG protect để test
-router.post("/", createUser);
-router.get("/", getUsers);
+router.post("/",protect, createUser);
+router.get("/", protect, getUsers);
 
 router.get("/:id", protect, getUserById);
 router.put("/:id", protect, updateUser);
