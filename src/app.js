@@ -3,6 +3,8 @@ import cors from "cors";
 import topicRoutes from "./routes/topic.route.js";
 import codeRoutes from "./routes/code.route.js";
 import tagRoutes from "./routes/tag.route.js";
+import userRoutes from "./routes/user.route.js";
+
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.get("/", (req, res) => {
 app.use("/api/topics", topicRoutes);
 app.use("/api/codes", codeRoutes);
 app.use("/api/tags", tagRoutes);
+app.use("/api/users", userRoutes);
+
 
 app.use("/api/codes", (req, res, next) => {
   if (!req.query.showUnpublished) {
