@@ -1,18 +1,65 @@
-import express from "express";
-import {
-  createUser,
-  getUsers,
-  getUserById,
-  updateUser,
-  deleteUser
-} from "../controllers/user.controller.js";
+import User from "../models/user.js";
 
-const router = express.Router();
+// CREATE
+export const createUser = async (req, res, next) => {
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
 
-router.post("/", createUser);        // CREATE
-router.get("/", getUsers);           // READ ALL
-router.get("/:id", getUserById);      // READ ONE
-router.put("/:id", updateUser);       // UPDATE
-router.delete("/:id", deleteUser);    // DELETE
+// READ ALL
+export const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
+};
 
-export default router;
+// READ ONE
+export const getUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// UPDATE
+export const updateUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE
+export const deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
