@@ -5,7 +5,25 @@ import jwt from "jsonwebtoken";
 // REGISTER
 export const register = async (req, res, next) => {
   try {
-    const user = await User.create(req.body);
+    const { name, email, password } = req.body;
+
+    // 1. Check email tồn tại
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // 2. Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Tạo user
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: "user", // ép role
+    });
+
     res.status(201).json({ message: "Register success" });
   } catch (err) {
     next(err);

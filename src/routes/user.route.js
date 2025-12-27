@@ -21,7 +21,8 @@ const router = express.Router();
 router.post("/", createUser);
 
 // READ all users
-router.get("/", protect, getUsers);
+// router.get("/", protect, getUsers);
+router.get("/", getUsers);
 
 // READ one user
 router.get("/:id", protect, getUserById);
