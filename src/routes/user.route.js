@@ -1,34 +1,34 @@
-import mongoose from "mongoose";
+import express from "express";
+import {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser
+} from "../controllers/user.controller.js";
 
-const userSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true
-    },
+import { protect } from "../middlewares/auth.middleware.js";
 
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true
-    },
+const router = express.Router();
 
-    password: {
-      type: String,
-      required: true,
-      select: false
-    },
+/**
+ * USER ROUTES
+ * /api/users
+ */
 
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user"
-    }
-  },
-  { timestamps: true }
-);
+// CREATE user (thường chỉ admin dùng)
+router.post("/", protect, createUser);
 
-export default mongoose.model("User", userSchema);
+// READ all users
+router.get("/", protect, getUsers);
+
+// READ one user
+router.get("/:id", protect, getUserById);
+
+// UPDATE user
+router.put("/:id", protect, updateUser);
+
+// DELETE user
+router.delete("/:id", protect, deleteUser);
+
+export default router;
