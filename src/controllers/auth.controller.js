@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 // REGISTER
-export const register = async (req, res, next) => {
+export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -21,27 +21,30 @@ export const register = async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
-      role: "user", // ép role
+      role: "user",
     });
 
     res.status(201).json({ message: "Register success" });
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: "Register failed" });
   }
 };
 
 // LOGIN
-export const login = async (req, res, next) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email }).select("+password");
-    if (!user)
+    if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     // Tạo token
     const token = jwt.sign(
@@ -50,24 +53,26 @@ export const login = async (req, res, next) => {
       { expiresIn: "7d" }
     );
 
-    // Lưu phiên bằng cookie
+    // Lưu token vào cookie
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({
       message: "Login success",
       user: {
         id: user._id,
-        username: user.username,
+        name: user.name, // ✅ sửa username -> name
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+        token: token,
+      },
     });
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: "Login failed" });
   }
 };
 

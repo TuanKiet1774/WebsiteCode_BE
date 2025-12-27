@@ -11,26 +11,12 @@ import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-/**
- * USER ROUTES
- * /api/users
- */
-
-// CREATE user (thường chỉ admin dùng)
-// router.post("/", protect, createUser);
+// TẠM THỜI KHÔNG protect để test
 router.post("/", createUser);
-
-// READ all users
-// router.get("/", protect, getUsers);
 router.get("/", getUsers);
 
-// READ one user
 router.get("/:id", protect, getUserById);
-
-// UPDATE user
 router.put("/:id", protect, updateUser);
-
-// DELETE user
 router.delete("/:id", protect, deleteUser);
 
 export default router;
