@@ -1,14 +1,16 @@
 import User from "../models/user.js";
 
 // CREATE
-export const createUser = async (req, res, next) => {
+export const createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
     res.status(201).json(user);
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(400).json({ message: err.message });
   }
 };
+
 
 // READ ALL
 export const getUsers = async (req, res, next) => {
