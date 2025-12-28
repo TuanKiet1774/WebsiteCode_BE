@@ -28,9 +28,12 @@ const codeSchema = new mongoose.Schema(
       }
     ],
 
-    language: {
-      type: [String],
-    },
+    language: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Language",
+      }
+    ],
 
     previewImages: {
       type: String,
