@@ -30,7 +30,6 @@ const codeSchema = new mongoose.Schema(
 
     language: {
       type: [String],
-      lowercase: true
     },
 
     previewImages: {
