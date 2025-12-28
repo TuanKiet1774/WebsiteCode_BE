@@ -23,13 +23,14 @@ export const createCode = async (req, res) => {
 export const getCodes = async (req, res) => {
   try {
     const { topic, tag, page = 1, limit = 10 } = req.query;
-    const filter = { isPublished: true };
+    const filter = {}; // bỏ isPublished
 
-    if (topic) filter.topicId = topic;
+    if (topic) filter.topics = topic;
     if (tag) filter.tags = tag;
 
     const codes = await Code.find(filter)
-      .populate("topicId", "name slug")
+      .populate("topics", "name slug")
+      .populate("tags", "name slug") // nếu muốn
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));

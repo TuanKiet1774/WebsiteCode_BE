@@ -28,12 +28,10 @@ const codeSchema = new mongoose.Schema(
       }
     ],
 
-    language: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Language",
-      }
-    ],
+    languageCode: {
+      type: String,
+      default: ""
+    },
 
     previewImages: {
       type: String,
@@ -66,10 +64,5 @@ const codeSchema = new mongoose.Schema(
     timestamps: true
   }
 );
-
-codeSchema.index({ slug: 1 });
-codeSchema.index({ topics: 1 });
-codeSchema.index({ tags: 1 });
-codeSchema.index({ title: "text", description: "text" });
 
 export default mongoose.model("Code", codeSchema);
