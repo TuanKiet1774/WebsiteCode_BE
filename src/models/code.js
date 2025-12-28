@@ -28,12 +28,10 @@ const codeSchema = new mongoose.Schema(
       }
     ],
 
-    language: [
-      {
-        type: String,
-        lowercase: true
-      }
-    ],
+    language: {
+      type: [String],
+      lowercase: true
+    },
 
     previewImages: {
       type: String,
