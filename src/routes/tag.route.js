@@ -6,14 +6,12 @@ import {
   updateTag,
   deleteTag
 } from "../controllers/tag.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
-
 const router = express.Router();
 
-router.post("/", protect, createTag);          // Create
-router.get("/", protect, getTags);             // Read all
-router.get("/:slug", protect, getTagBySlug);   // Read one
-router.put("/:id", protect, updateTag);        // Update
-router.delete("/:id", protect, deleteTag);     // Delete
+router.post("/", createTag);          // Create
+router.get("/", getTags);             // Read all
+router.get("/:slug", getTagBySlug);   // Read one
+router.put("/:id", updateTag);        // Update
+router.delete("/:id", deleteTag);     // Delete
 
 export default router;
