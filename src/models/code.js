@@ -28,17 +28,17 @@ const codeSchema = new mongoose.Schema(
       }
     ],
 
-    language: {
-      type: String,
-      required: true,
-      lowercase: true
-    },
-
-    previewImages: [
+    language: [
       {
-        type: String
+        type: String,
+        lowercase: true
       }
     ],
+
+    previewImages: {
+      type: String,
+      default: ""
+    },
 
     demoUrl: {
       type: String,
@@ -52,8 +52,8 @@ const codeSchema = new mongoose.Schema(
 
     tags: [
       {
-        type: String,
-        lowercase: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag",
       }
     ],
 
