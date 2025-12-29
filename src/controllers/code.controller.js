@@ -108,40 +108,46 @@ export const deleteCode = async (req, res) => {
  */
 export const searchCodes = async (req, res, next) => {
   try {
-    const { keyword } = req.query;
+    const { keyword = "", page = 1, limit = 6 } = req.query;
 
-    if (!keyword) {
-      return res.status(400).json({ message: "Keyword is required" });
-    }
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
     const regex = new RegExp(keyword, "i");
 
-    // 🔍 Tìm tag & topic theo keyword
+    // 🔍 tìm tag & topic
     const tags = await Tag.find({ name: regex }).select("_id");
     const topics = await Topic.find({ name: regex }).select("_id");
 
-    const tagIds = tags.map(tag => tag._id);
-    const topicIds = topics.map(topic => topic._id);
+    const tagIds = tags.map(t => t._id);
+    const topicIds = topics.map(t => t._id);
 
-    // 🔎 Tìm code
-    const codes = await Code.find({
+    const filter = {
       $or: [
         { title: regex },
         { languageCode: regex },
         { tags: { $in: tagIds } },
         { topics: { $in: topicIds } }
       ]
-    })
+    };
+
+    // 🔢 TOTAL (phải đếm TRƯỚC)
+    const total = await Code.countDocuments(filter);
+
+    // 📄 DATA (có skip + limit)
+    const codes = await Code.find(filter)
       .populate("tags", "name")
       .populate("topics", "name")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
 
     res.status(200).json({
-      total: codes.length,
+      total,
       data: codes
     });
   } catch (err) {
     next(err);
   }
 };
-
