@@ -1,4 +1,6 @@
 import Code from "../models/code.js";
+import Tag from "../models/tag.js";
+import Topic from "../models/topic.js";
 
 /**
  * CREATE Code
@@ -104,20 +106,42 @@ export const deleteCode = async (req, res) => {
  * SEARCH Code
  * GET /api/codes/search?q=keyword
  */
-export const searchCodes = async (req, res) => {
+export const searchCodes = async (req, res, next) => {
   try {
-    const { q, page = 1, limit = 10 } = req.query;
-    if (!q) return res.status(400).json({ message: "Query is required" });
+    const { keyword } = req.query;
 
-    const codes = await Code.find({ $text: { $search: q }, isPublished: true })
-      .populate("topicId", "name slug")
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+    if (!keyword) {
+      return res.status(400).json({ message: "Keyword is required" });
+    }
 
-    const total = await Code.countDocuments({ $text: { $search: q }, isPublished: true });
+    const regex = new RegExp(keyword, "i");
 
-    res.json({ total, page: Number(page), limit: Number(limit), codes });
+    // 🔍 Tìm tag & topic theo keyword
+    const tags = await Tag.find({ name: regex }).select("_id");
+    const topics = await Topic.find({ name: regex }).select("_id");
+
+    const tagIds = tags.map(tag => tag._id);
+    const topicIds = topics.map(topic => topic._id);
+
+    // 🔎 Tìm code
+    const codes = await Code.find({
+      $or: [
+        { title: regex },
+        { languageCode: regex },
+        { tags: { $in: tagIds } },
+        { topics: { $in: topicIds } }
+      ]
+    })
+      .populate("tags", "name")
+      .populate("topics", "name")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      total: codes.length,
+      data: codes
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
+

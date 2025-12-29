@@ -10,6 +10,7 @@ import {
 
 const router = express.Router();
 
+router.get("/search", searchCodes);
 router.post("/", createCode);          // Create
 router.get("/", getCodes);             // Read all
 router.get("/search", searchCodes);    // Search
