@@ -1,38 +1,33 @@
-import express from "express";
-import Carousel from "../models/carousel.js"; // đường dẫn tới file schema
+// controllers/carousel.controller.js
+import Carousel from "../models/carousel.js";
 
-const router = express.Router();
-
-// -------------------- CREATE --------------------
-router.post("/", async (req, res) => {
+// CREATE
+export const createCarousel = async (req, res) => {
   try {
     const { title, imgUrl, description } = req.body;
+    if (!title || !imgUrl)
+      return res.status(400).json({ message: "Title and imgUrl are required" });
 
-    const carousel = new Carousel({
-      title,
-      imgUrl,
-      description
-    });
-
-    const savedCarousel = await carousel.save();
+    const newCarousel = new Carousel({ title, imgUrl, description });
+    const savedCarousel = await newCarousel.save();
     res.status(201).json(savedCarousel);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
-// -------------------- READ ALL --------------------
-router.get("/", async (req, res) => {
+// READ ALL
+export const getAllCarousels = async (req, res) => {
   try {
     const carousels = await Carousel.find().sort({ createdAt: -1 });
     res.json(carousels);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
-// -------------------- READ ONE --------------------
-router.get("/:id", async (req, res) => {
+// READ ONE
+export const getCarouselById = async (req, res) => {
   try {
     const carousel = await Carousel.findById(req.params.id);
     if (!carousel) return res.status(404).json({ message: "Carousel not found" });
@@ -40,10 +35,10 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
-// -------------------- UPDATE --------------------
-router.put("/:id", async (req, res) => {
+// UPDATE
+export const updateCarousel = async (req, res) => {
   try {
     const { title, imgUrl, description } = req.body;
     const updatedCarousel = await Carousel.findByIdAndUpdate(
@@ -51,16 +46,15 @@ router.put("/:id", async (req, res) => {
       { title, imgUrl, description },
       { new: true, runValidators: true }
     );
-
     if (!updatedCarousel) return res.status(404).json({ message: "Carousel not found" });
     res.json(updatedCarousel);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
-// -------------------- DELETE --------------------
-router.delete("/:id", async (req, res) => {
+// DELETE
+export const deleteCarousel = async (req, res) => {
   try {
     const deletedCarousel = await Carousel.findByIdAndDelete(req.params.id);
     if (!deletedCarousel) return res.status(404).json({ message: "Carousel not found" });
@@ -68,6 +62,4 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
-
-export default router;
+};
