@@ -114,39 +114,40 @@ export const searchCodes = async (req, res, next) => {
     const limitNumber = Number(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    const regex = new RegExp(keyword, "i");
+    if (!keyword.trim()) {
+      return res.json({ total: 0, data: [] });
+    }
 
-    // 🔍 tìm tag & topic
-    const tags = await Tag.find({ name: regex }).select("_id");
-    const topics = await Topic.find({ name: regex }).select("_id");
+    // 🔍 TÌM TAG + TOPIC SONG SONG
+    const [tags, topics] = await Promise.all([
+      Tag.find({ $text: { $search: keyword } }).select("_id"),
+      Topic.find({ $text: { $search: keyword } }).select("_id")
+    ]);
 
     const tagIds = tags.map(t => t._id);
     const topicIds = topics.map(t => t._id);
 
     const filter = {
       $or: [
-        { title: regex },
-        { languageCode: regex },
+        { $text: { $search: keyword } },
         { tags: { $in: tagIds } },
         { topics: { $in: topicIds } }
       ]
     };
 
-    // 🔢 TOTAL (phải đếm TRƯỚC)
+    // 🔢 TOTAL
     const total = await Code.countDocuments(filter);
 
-    // 📄 DATA (có skip + limit)
+    // 📄 DATA (LIMIT TRƯỚC → POPULATE SAU)
     const codes = await Code.find(filter)
-      .populate("tags", "name")
-      .populate("topics", "name")
+      .select("title slug previewImages isFree demoUrl tags topics createdAt")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limitNumber);
+      .limit(limitNumber)
+      .populate("tags", "name")
+      .populate("topics", "name");
 
-    res.status(200).json({
-      total,
-      data: codes
-    });
+    res.json({ total, data: codes });
   } catch (err) {
     next(err);
   }

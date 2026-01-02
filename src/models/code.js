@@ -65,4 +65,10 @@ const codeSchema = new mongoose.Schema(
   }
 );
 
+codeSchema.index({
+  title: "text",
+  languageCode: "text",
+  description: "text"
+});
+
 export default mongoose.model("Code", codeSchema);
