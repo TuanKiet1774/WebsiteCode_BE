@@ -1,4 +1,3 @@
-// controllers/carousel.controller.js
 import Carousel from "../models/carousel.js";
 
 // CREATE
