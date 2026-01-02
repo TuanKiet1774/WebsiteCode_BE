@@ -6,6 +6,7 @@ import tagRoutes from "./routes/tag.route.js";
 import userRoutes from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
+import carouselRoutes from "./routes/carousel.routes.js";
 
 const app = express();
 app.use(cookieParser());
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
   res.send("🚀 Code Showcase API is running!");
 });
 
+app.use("/api/carousels", carouselRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/topics", topicRoutes);
 app.use("/api/codes", codeRoutes);
