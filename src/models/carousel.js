@@ -17,6 +17,11 @@ const carouselSchema = new mongoose.Schema(
     description: {
       type: String,
       default: ""
+    },
+
+    isHot: {
+      type: Boolean,
+      default: true
     }
   },
   {
