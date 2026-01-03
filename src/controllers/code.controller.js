@@ -118,29 +118,31 @@ export const searchCodes = async (req, res, next) => {
       return res.json({ total: 0, data: [] });
     }
 
-    // 🔍 TÌM TAG + TOPIC SONG SONG
+    const regex = new RegExp(keyword, "i");
+
+    // 🔍 tìm tag + topic trước
     const [tags, topics] = await Promise.all([
-      Tag.find({ $text: { $search: keyword } }).select("_id"),
-      Topic.find({ $text: { $search: keyword } }).select("_id")
+      Tag.find({ name: regex }).select("_id"),
+      Topic.find({ name: regex }).select("_id")
     ]);
 
     const tagIds = tags.map(t => t._id);
     const topicIds = topics.map(t => t._id);
 
+    // 🔍 FILTER ĐÚNG
     const filter = {
       $or: [
-        { $text: { $search: keyword } },
+        { title: regex },
+        { languageCode: regex },
         { tags: { $in: tagIds } },
         { topics: { $in: topicIds } }
       ]
     };
 
-    // 🔢 TOTAL
     const total = await Code.countDocuments(filter);
 
-    // 📄 DATA (LIMIT TRƯỚC → POPULATE SAU)
     const codes = await Code.find(filter)
-      .select("title slug previewImages isFree demoUrl tags topics createdAt")
+      .select("title slug previewImages isFree demoUrl tags topics createdAt languageCode")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNumber)
@@ -152,3 +154,4 @@ export const searchCodes = async (req, res, next) => {
     next(err);
   }
 };
+
