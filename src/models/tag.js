@@ -21,4 +21,8 @@ const tagSchema = new mongoose.Schema(
   }
 );
 
+tagSchema.index({ createdAt: -1 });
+tagSchema.index({ name: 1});
+tagSchema.index({ slug: 1 });
+
 export default mongoose.model("Tag", tagSchema);

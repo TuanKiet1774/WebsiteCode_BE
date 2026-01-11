@@ -1,94 +1,145 @@
 import Tag from "../models/tag.js";
 
-/**
- * CREATE tag
- * POST /api/tags
- */
+/* ===========================
+   CREATE TAG
+   POST /api/tags
+=========================== */
 export const createTag = async (req, res) => {
   try {
-    const tag = await Tag.create(req.body);
+    const { name, slug } = req.body;
+
+    const tag = await Tag.create({
+      name,
+      slug,
+    });
+
     res.status(201).json(tag);
   } catch (err) {
-    // trùng name hoặc slug
     if (err.code === 11000) {
       return res.status(409).json({
-        message: "Tag name or slug already exists"
+        message: "Tag name or slug already exists",
       });
     }
-    res.status(400).json({ message: err.message });
+
+    res.status(400).json({
+      message: err.message,
+    });
   }
 };
 
-/**
- * READ all tags
- * GET /api/tags
- */
+/* ===========================
+   GET TAGS (PAGINATION)
+   GET /api/tags?page=1&limit=5&q=
+=========================== */
 export const getTags = async (req, res) => {
   try {
-    const tags = await Tag.find().sort({ name: 1 });
-    res.json(tags);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const keyword = req.query.q || "";
+
+    const filter = keyword ? { name: { $regex: keyword, $options: "i" } } : {};
+
+    const [tags, total] = await Promise.all([
+      Tag.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+
+      Tag.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      data: tags,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: "Fetch tags failed",
+      error: err.message,
+    });
   }
 };
 
-/**
- * READ tag by slug
- * GET /api/tags/:slug
- */
+/* ===========================
+   GET TAG BY SLUG
+   GET /api/tags/:slug
+=========================== */
 export const getTagBySlug = async (req, res) => {
   try {
     const tag = await Tag.findOne({ slug: req.params.slug });
+
     if (!tag) {
-      return res.status(404).json({ message: "Tag not found" });
+      return res.status(404).json({
+        message: "Tag not found",
+      });
     }
-    res.json(tag);
+
+    res.status(200).json(tag);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+    });
   }
 };
 
-/**
- * UPDATE tag
- * PUT /api/tags/:id
- */
+/* ===========================
+   UPDATE TAG
+   PUT /api/tags/:id
+=========================== */
 export const updateTag = async (req, res) => {
   try {
+    const { name, slug } = req.body;
+
     const tag = await Tag.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true, runValidators: true }
+      { name, slug },
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     if (!tag) {
-      return res.status(404).json({ message: "Tag not found" });
+      return res.status(404).json({
+        message: "Tag not found",
+      });
     }
 
-    res.json(tag);
+    res.status(200).json(tag);
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({
-        message: "Tag name or slug already exists"
+        message: "Tag name or slug already exists",
       });
     }
-    res.status(400).json({ message: err.message });
+
+    res.status(400).json({
+      message: err.message,
+    });
   }
 };
 
-/**
- * DELETE tag
- * DELETE /api/tags/:id
- */
+/* ===========================
+   DELETE TAG
+   DELETE /api/tags/:id
+=========================== */
 export const deleteTag = async (req, res) => {
   try {
     const tag = await Tag.findByIdAndDelete(req.params.id);
 
     if (!tag) {
-      return res.status(404).json({ message: "Tag not found" });
+      return res.status(404).json({
+        message: "Tag not found",
+      });
     }
 
-    res.json({ message: "Tag deleted successfully" });
+    res.status(200).json({
+      message: "Tag deleted successfully",
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message,
+    });
   }
 };
