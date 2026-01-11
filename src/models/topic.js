@@ -37,6 +37,6 @@ const topicSchema = new mongoose.Schema(
 
 topicSchema.index({ createdAt: -1 });
 topicSchema.index({ name: 1 });
-topicSchema.index({ slug: 1 });
+topicSchema.index({ order: 1 });
 
 export default mongoose.model("Topic", topicSchema);
