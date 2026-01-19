@@ -34,47 +34,51 @@ export const register = async (req, res) => {
 // LOGIN
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ email }).select("+password");
+    // 1. Tìm user theo username
+    const user = await User.findOne({ username }).select("+password");
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // 2. So sánh password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Tạo token
+    // 3. Tạo JWT
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Lưu token vào cookie
+    // 4. Lưu token vào cookie
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // 5. Response
     res.json({
       message: "Login success",
       user: {
         id: user._id,
-        username: user.username, 
+        username: user.username,
         email: user.email,
         role: user.role,
-        token: token,
       },
+      token, // nếu frontend cần
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Login failed" });
   }
 };
+
 
 // LOGOUT
 export const logout = (req, res) => {
