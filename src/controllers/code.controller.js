@@ -24,22 +24,45 @@ export const createCode = async (req, res) => {
  */
 export const getCodes = async (req, res) => {
   try {
-    const { topic, tag, page = 1, limit = 10 } = req.query;
-    const filter = {}; // bỏ isPublished
+    const { topic, tag, search, page = 1, limit = 10 } = req.query;
+    let filter = {};
 
     if (topic) filter.topics = topic;
     if (tag) filter.tags = tag;
 
+    if (search) {
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escapedSearch, "i");
+
+      // Tìm các topics/tags phù hợp với keyword
+      const [matchedTopics, matchedTags] = await Promise.all([
+        Topic.find({ name: regex }).select("_id"),
+        Tag.find({ name: regex }).select("_id")
+      ]);
+
+      filter.$or = [
+        { title: regex },
+        { slug: regex },
+        { description: regex },
+        { languageCode: regex },
+        { topics: { $in: matchedTopics.map(t => t._id) } },
+        { tags: { $in: matchedTags.map(t => t._id) } }
+      ];
+    }
+
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+
     const codes = await Code.find(filter)
       .populate("topics", "name slug")
-      .populate("tags", "name slug") // nếu muốn
+      .populate("tags", "name slug")
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
 
     const total = await Code.countDocuments(filter);
 
-    res.json({ total, page: Number(page), limit: Number(limit), codes });
+    res.json({ total, page: pageNum, limit: limitNum, codes });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

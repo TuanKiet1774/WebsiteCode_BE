@@ -26,13 +26,6 @@ app.use("/api/tags", tagRoutes);
 app.use("/api/users", userRoutes);
 
 
-app.use("/api/codes", (req, res, next) => {
-  if (!req.query.showUnpublished) {
-    req.query.isPublished = true;
-  }
-  next();
-});
-
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(400).json({
