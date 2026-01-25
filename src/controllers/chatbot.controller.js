@@ -201,8 +201,8 @@ export const getChatConfig = async (req, res) => {
     if (!config) {
       // Tạo default nếu chưa có
       config = await Chatbot.create({
-        botName: "Gitf-Con",
-        personality: "Bạn là Gitf-Con.",
+        botName: "Gift-Con",
+        personality: "Bạn là Gift-Con.",
         welcomeMessage:
           "Chào bạn! Tui là Gift-Con đây. Chào mừng bạn đến với kho Website đáng yêu của Dr.Gifter! Bạn cần tui giúp gì không nè?",
         suggestedQuestions: [
