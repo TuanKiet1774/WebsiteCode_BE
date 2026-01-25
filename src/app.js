@@ -7,6 +7,8 @@ import userRoutes from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import carouselRoutes from "./routes/carousel.route.js";
+import chatbotRoutes from "./routes/chatbot.route.js";
+
 
 const app = express();
 app.use(cookieParser());
@@ -24,7 +26,7 @@ app.use("/api/topics", topicRoutes);
 app.use("/api/codes", codeRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/users", userRoutes);
-
+app.use("/api/chatbot", chatbotRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
