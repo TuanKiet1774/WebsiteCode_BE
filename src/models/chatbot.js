@@ -17,9 +17,9 @@ const chatbotSchema = new mongoose.Schema({
   },
   suggestedQuestions: [
     {
-      question: String,
-      hint: String,
-      reply: String,
+      text: String,
+      label: String,
+      response: String,
     },
   ],
   errorMessage: {

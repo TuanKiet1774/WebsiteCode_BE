@@ -42,7 +42,9 @@ export const chatWithGift = async (req, res) => {
 
     // Kiểm tra xem đây có phải là câu hỏi gợi ý không
     const suggestedQuestion = config.suggestedQuestions?.find(
-      (q) => q.text.toLowerCase() === message.toLowerCase(),
+      (q) =>
+        typeof q.text === "string" &&
+        q.text.toLowerCase() === message.toLowerCase(),
     );
     const isSuggested = !!suggestedQuestion;
 
