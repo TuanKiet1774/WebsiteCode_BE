@@ -131,50 +131,81 @@ export const deleteCode = async (req, res) => {
  */
 export const searchCodes = async (req, res, next) => {
   try {
-    const { keyword = "", page = 1, limit = 6 } = req.query;
+    let {
+      page = 1,
+      limit = 10,
+      search = "",
+      topic = "",
+      tag = "",
+      isFree = "",
+    } = req.query;
 
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
-    const skip = (pageNumber - 1) * limitNumber;
+    page = Number(page);
+    limit = Number(limit);
+    const skip = (page - 1) * limit;
 
-    if (!keyword.trim()) {
-      return res.json({ total: 0, data: [] });
-    }
+    const filter = {};
 
-    const regex = new RegExp(keyword, "i");
+    /* ================= SEARCH ================= */
+    if (search.trim()) {
+      const regex = new RegExp(search, "i");
 
-    // 🔍 tìm tag + topic trước
-    const [tags, topics] = await Promise.all([
-      Tag.find({ name: regex }).select("_id"),
-      Topic.find({ name: regex }).select("_id")
-    ]);
+      const [tags, topics] = await Promise.all([
+        Tag.find({ name: regex }).select("_id"),
+        Topic.find({ name: regex }).select("_id"),
+      ]);
 
-    const tagIds = tags.map(t => t._id);
-    const topicIds = topics.map(t => t._id);
-
-    // 🔍 FILTER ĐÚNG
-    const filter = {
-      $or: [
+      filter.$or = [
         { title: regex },
         { languageCode: regex },
-        { tags: { $in: tagIds } },
-        { topics: { $in: topicIds } }
-      ]
-    };
+        { tags: { $in: tags.map((t) => t._id) } },
+        { topics: { $in: topics.map((t) => t._id) } },
+      ];
+    }
 
+    /* ================= FILTER TAG ================= */
+    if (tag) {
+      const tagDoc = await Tag.findOne({ name: tag });
+      if (tagDoc) {
+        filter.tags = tagDoc._id;
+      }
+    }
+
+    /* ================= FILTER TOPIC ================= */
+    if (topic) {
+      const topicDoc = await Topic.findOne({ name: topic });
+      if (topicDoc) {
+        filter.topics = topicDoc._id;
+      }
+    }
+
+    /* ================= FILTER FREE ================= */
+    if (isFree !== "") {
+      filter.isFree = isFree === "true";
+    }
+
+    /* ================= QUERY ================= */
     const total = await Code.countDocuments(filter);
 
     const codes = await Code.find(filter)
-      .select("title slug previewImages isFree demoUrl tags topics createdAt languageCode")
+      .select(
+        "title slug previewImages isFree demoUrl tags topics createdAt languageCode",
+      )
+      .populate("tags", "name")
+      .populate("topics", "name")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limitNumber)
-      .populate("tags", "name")
-      .populate("topics", "name");
+      .limit(limit);
 
-    res.json({ total, data: codes });
+    res.json({
+      total,
+      page,
+      limit,
+      data: codes,
+    });
   } catch (err) {
     next(err);
   }
 };
+
 
