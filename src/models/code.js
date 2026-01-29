@@ -5,70 +5,75 @@ const codeSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     slug: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true
+      lowercase: true,
     },
 
     description: {
       type: String,
-      default: ""
+      default: "",
     },
 
     topics: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Topic",
-        required: true
-      }
+        required: true,
+      },
     ],
 
     languageCode: {
       type: String,
-      default: ""
+      default: "",
     },
 
     previewImages: {
       type: String,
-      default: ""
+      default: "",
+    },
+
+    videoUrl: {
+      type: String,
+      default: "",
     },
 
     demoUrl: {
       type: String,
-      default: ""
+      default: "",
     },
 
     githubUrl: {
       type: String,
-      default: ""
+      default: "",
     },
 
     tags: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Tag",
-      }
+      },
     ],
 
     isFree: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 codeSchema.index({
   title: "text",
   languageCode: "text",
-  description: "text"
+  description: "text",
 });
 
 export default mongoose.model("Code", codeSchema);
